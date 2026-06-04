@@ -1,5 +1,11 @@
 package integrado.prog2;
 
+import integrado.prog2.entities.Usuario;
+import integrado.prog2.enums.Rol;
+import integrado.prog2.exception.EntityNotFoundException;
+import integrado.prog2.service.UsuarioService;
+import java.util.Scanner;
+
 /**
  *
  * @author Mariano_Chirino
@@ -23,6 +29,44 @@ public class Main {
     ● Para facilitar pruebas, es válido listar elementos antes de pedir un ID (por ejemplo: listar categorías y luego pedir id).
      */
     public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+        UsuarioService usuarioService = new UsuarioService();
+
+        int opcion;
+
+        do {
+
+            System.out.println("\n=== MENU USUARIOS ===");
+            System.out.println("1. Listar");
+            System.out.println("2. Crear");
+            System.out.println("3. Editar");
+            System.out.println("4. Eliminar");
+            System.out.println("0. Salir");
+
+            opcion = sc.nextInt();
+
+            switch (opcion) {
+
+                case 1:
+                    // listar
+                    break;
+
+                case 2:
+                    // crear
+                    break;
+
+                case 3:
+                    // editar
+                    break;
+
+                case 4:
+                    // eliminar
+                    break;
+
+            }
+
+        } while (opcion != 0);
 
     }
 }
