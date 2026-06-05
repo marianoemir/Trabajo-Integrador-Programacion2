@@ -4,84 +4,173 @@ import integrado.prog2.entities.Usuario;
 import integrado.prog2.enums.Rol;
 import integrado.prog2.exception.EntityNotFoundException;
 import integrado.prog2.service.UsuarioService;
+import java.util.List;
 import java.util.Scanner;
 
-/**
- *
- * @author Mariano_Chirino
- */
 public class Main {
 
-    /*
-    El sistema debe iniciar mostrando un menú principal similar al siguiente (el texto puede variar, pero la idea es la misma):
-    === SISTEMA DE PEDIDOS (FOOD STORE) === 
-    1. Categorías 2. Productos 3. Usuarios 4. Pedidos 0. Salir Seleccione:
-    Cada opción abre un submenú CRUD. Ejemplo para Categorías:
-    1. Listar 
-    2. Crear 
-    3. Editar 
-    4. Eliminar Seleccione:
-    
-    Pautas importantes del menú:
-    
-    ● El menú debe validar entradas (opciones fuera de rango, ids inexistentes, números mal ingresados).
-    ● Las operaciones deben mostrar mensajes claros (éxito / error) y retornar al menú. 
-    ● Para facilitar pruebas, es válido listar elementos antes de pedir un ID (por ejemplo: listar categorías y luego pedir id).
-     */
+    static Scanner sc = new Scanner(System.in);
+    static UsuarioService usuarioService = new UsuarioService();
+
     public static void main(String[] args) {
 
-//        Scanner sc = new Scanner(System.in);
-//        UsuarioService usuarioService = new UsuarioService();
-//
-//        int opcion;
-//
-//        do {
-//
-//            System.out.println("\n=== MENU USUARIOS ===");
-//            System.out.println("1. Listar");
-//            System.out.println("2. Crear");
-//            System.out.println("3. Editar");
-//            System.out.println("4. Eliminar");
-//            System.out.println("0. Salir");
-//
-//            opcion = sc.nextInt();
-//
-//            switch (opcion) {
-//
-//                case 1:
-//                    // listar
-//                    break;
-//
-//                case 2:
-//                    // crear
-//                    break;
-//
-//                case 3:
-//                    // editar
-//                    break;
-//
-//                case 4:
-//                    // eliminar
-//                    break;
-//
-//            }
-//
-//        } while (opcion != 0);
-        UsuarioService usuarioService = new UsuarioService();
+        int opcion;
 
-// 1. Crear usuario de prueba
-        Usuario u = new Usuario();
-        u.setNombre("jose");
-        u.setApellido("Perez");
-        u.setMail("juan@mail.com");
-        u.setCelular("261111111");
-        u.setContrasenia("1234");
-        u.setRol(Rol.USUARIO);
-        usuarioService.guardar(u);
-        System.out.println("Usuario guardado");
+        do {
+            System.out.println("\n=== FOOD STORE ===");
+            System.out.println("1. Categorias");
+            System.out.println("2. Productos");
+            System.out.println("3. Usuarios");
+            System.out.println("4. Pedidos");
+            System.out.println("0. Salir");
+            System.out.print("Seleccione: ");
 
-// 2. Listar
-        usuarioService.listar().forEach(System.out::println);
+            opcion = leerEntero();
 
+            switch (opcion) {
+                case 1 -> System.out.println("(pendiente compañero A)");
+                case 2 -> System.out.println("(pendiente compañero A)");
+                case 3 -> menuUsuarios();
+                case 4 -> System.out.println("(pendiente compañero C)");
+                case 0 -> System.out.println("Saliendo...");
+                default -> System.out.println("Opcion invalida.");
+            }
+
+        } while (opcion != 0);
+    }
+
+    static void menuUsuarios() {
+
+        int opcion;
+
+        do {
+            System.out.println("\n=== MENU USUARIOS ===");
+            System.out.println("1. Listar");
+            System.out.println("2. Crear");
+            System.out.println("3. Editar");
+            System.out.println("4. Eliminar");
+            System.out.println("0. Volver");
+            System.out.print("Seleccione: ");
+
+            opcion = leerEntero();
+
+            switch (opcion) {
+                case 1 -> listarUsuarios();
+                case 2 -> crearUsuario();
+                case 3 -> editarUsuario();
+                case 4 -> eliminarUsuario();
+                case 0 -> System.out.println("Volviendo...");
+                default -> System.out.println("Opcion invalida.");
+            }
+
+        } while (opcion != 0);
+    }
+
+    static void listarUsuarios() {
+        List<Usuario> usuarios = usuarioService.listar();
+        if (usuarios.isEmpty()) {
+            System.out.println("No hay usuarios cargados.");
+        } else {
+            usuarios.forEach(System.out::println);
+        }
+    }
+
+    static void crearUsuario() {
+        System.out.print("Nombre: ");
+        String nombre = sc.nextLine();
+        System.out.print("Apellido: ");
+        String apellido = sc.nextLine();
+        System.out.print("Mail: ");
+        String mail = sc.nextLine();
+        System.out.print("Celular: ");
+        String celular = sc.nextLine();
+        System.out.print("Contrasenia: ");
+        String contrasenia = sc.nextLine();
+        System.out.println("Rol (1. ADMIN / 2. USUARIO): ");
+        int rolOpcion = leerEntero();
+        Rol rol = rolOpcion == 1 ? Rol.ADMIN : Rol.USUARIO;
+
+        Usuario usuario = new Usuario();
+        usuario.setNombre(nombre);
+        usuario.setApellido(apellido);
+        usuario.setMail(mail);
+        usuario.setCelular(celular);
+        usuario.setContrasenia(contrasenia);
+        usuario.setRol(rol);
+
+        try {
+            usuarioService.guardar(usuario);
+            System.out.println("Usuario creado correctamente.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    static void editarUsuario() {
+        listarUsuarios();
+        System.out.print("Ingrese el ID del usuario a editar: ");
+        Long id = leerLong();
+
+        try {
+            Usuario usuario = usuarioService.buscarPorId(id);
+            System.out.print("Nuevo nombre (" + usuario.getNombre() + "): ");
+            String nombre = sc.nextLine();
+            System.out.print("Nuevo apellido (" + usuario.getApellido() + "): ");
+            String apellido = sc.nextLine();
+            System.out.print("Nuevo mail (" + usuario.getMail() + "): ");
+            String mail = sc.nextLine();
+            System.out.print("Nuevo celular (" + usuario.getCelular() + "): ");
+            String celular = sc.nextLine();
+
+            if (!nombre.isBlank()) usuario.setNombre(nombre);
+            if (!apellido.isBlank()) usuario.setApellido(apellido);
+            if (!mail.isBlank()) usuario.setMail(mail);
+            if (!celular.isBlank()) usuario.setCelular(celular);
+
+            usuarioService.actualizar(usuario);
+            System.out.println("Usuario actualizado correctamente.");
+
+        } catch (EntityNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    static void eliminarUsuario() {
+        listarUsuarios();
+        System.out.print("Ingrese el ID del usuario a eliminar: ");
+        Long id = leerLong();
+
+        System.out.print("Confirma la eliminacion? (S/N): ");
+        String confirmacion = sc.nextLine();
+
+        if (confirmacion.equalsIgnoreCase("S")) {
+            try {
+                usuarioService.eliminar(id);
+                System.out.println("Usuario eliminado correctamente.");
+            } catch (EntityNotFoundException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Operacion cancelada.");
+        }
+    }
+
+    static int leerEntero() {
+        try {
+            int valor = Integer.parseInt(sc.nextLine());
+            return valor;
+        } catch (NumberFormatException e) {
+            System.out.println("Ingrese un numero valido.");
+            return -1;
+        }
+    }
+
+    static Long leerLong() {
+        try {
+            return Long.parseLong(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Ingrese un numero valido.");
+            return -1L;
+        }
     }
 }
