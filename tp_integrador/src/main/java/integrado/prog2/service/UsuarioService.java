@@ -15,11 +15,15 @@ public class UsuarioService {
     }
 
     public void guardar(Usuario usuario) {
-
+        if (usuario.getNombre() == null || usuario.getNombre().isBlank()) {
+            throw new IllegalArgumentException("El nombre es obligatorio");
+        }
         if (usuario.getMail() == null || usuario.getMail().isBlank()) {
             throw new IllegalArgumentException("El mail es obligatorio");
         }
-
+        if (usuario.getContrasenia() == null || usuario.getContrasenia().isBlank()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria");
+        }
         usuarioDAO.guardar(usuario);
     }
 
