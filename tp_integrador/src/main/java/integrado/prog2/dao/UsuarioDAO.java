@@ -19,8 +19,7 @@ public class UsuarioDAO {
                 """;
 
         try (
-                Connection conn = ConexionDB.getConexion();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                Connection conn = ConexionDB.getConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNombre());
             ps.setString(2, usuario.getApellido());
@@ -32,9 +31,13 @@ public class UsuarioDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println("Error al guardar usuario");
+        if (e.getMessage().contains("UNIQUE constraint failed")) {
+            System.out.println("Error: el mail ya está registrado.");
+        } else {
+            System.out.println("Error al guardar el usuario.");
             e.printStackTrace();
         }
+    }
     }
 
     public List<Usuario> listar() {
@@ -48,9 +51,7 @@ public class UsuarioDAO {
                 """;
 
         try (
-                Connection conn = ConexionDB.getConexion();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+                Connection conn = ConexionDB.getConexion(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
@@ -76,25 +77,24 @@ public class UsuarioDAO {
 
     public Usuario buscarPorId(Long id) {
 
-        String sql = """
-                SELECT *
-                FROM usuario
-                WHERE id = ?
-                AND eliminado = 0
-                """;
+    String sql = """
+            SELECT *
+            FROM usuario
+            WHERE id = ?
+            AND eliminado = 0
+            """;
 
-        try (
-                Connection conn = ConexionDB.getConexion();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+    try (
+            Connection conn = ConexionDB.getConexion();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, id);
+        ps.setLong(1, id);
 
-            ResultSet rs = ps.executeQuery();
+        try (ResultSet rs = ps.executeQuery()) {
 
             if (rs.next()) {
 
                 Usuario usuario = new Usuario();
-
                 usuario.setId(rs.getLong("id"));
                 usuario.setNombre(rs.getString("nombre"));
                 usuario.setApellido(rs.getString("apellido"));
@@ -105,13 +105,14 @@ public class UsuarioDAO {
 
                 return usuario;
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
 
-        return null;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+
+    return null;
+}
 
     public void actualizar(Usuario usuario) {
 
@@ -127,8 +128,7 @@ public class UsuarioDAO {
                 """;
 
         try (
-                Connection conn = ConexionDB.getConexion();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                Connection conn = ConexionDB.getConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNombre());
             ps.setString(2, usuario.getApellido());
@@ -154,8 +154,7 @@ public class UsuarioDAO {
                 """;
 
         try (
-                Connection conn = ConexionDB.getConexion();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                Connection conn = ConexionDB.getConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, id);
 

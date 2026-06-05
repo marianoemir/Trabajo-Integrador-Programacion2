@@ -30,43 +30,58 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        Scanner sc = new Scanner(System.in);
+//        Scanner sc = new Scanner(System.in);
+//        UsuarioService usuarioService = new UsuarioService();
+//
+//        int opcion;
+//
+//        do {
+//
+//            System.out.println("\n=== MENU USUARIOS ===");
+//            System.out.println("1. Listar");
+//            System.out.println("2. Crear");
+//            System.out.println("3. Editar");
+//            System.out.println("4. Eliminar");
+//            System.out.println("0. Salir");
+//
+//            opcion = sc.nextInt();
+//
+//            switch (opcion) {
+//
+//                case 1:
+//                    // listar
+//                    break;
+//
+//                case 2:
+//                    // crear
+//                    break;
+//
+//                case 3:
+//                    // editar
+//                    break;
+//
+//                case 4:
+//                    // eliminar
+//                    break;
+//
+//            }
+//
+//        } while (opcion != 0);
         UsuarioService usuarioService = new UsuarioService();
 
-        int opcion;
+// 1. Crear usuario de prueba
+        Usuario u = new Usuario();
+        u.setNombre("jose");
+        u.setApellido("Perez");
+        u.setMail("juan@mail.com");
+        u.setCelular("261111111");
+        u.setContrasenia("1234");
+        u.setRol(Rol.USUARIO);
+        usuarioService.guardar(u);
+        System.out.println("Usuario guardado");
 
-        do {
-
-            System.out.println("\n=== MENU USUARIOS ===");
-            System.out.println("1. Listar");
-            System.out.println("2. Crear");
-            System.out.println("3. Editar");
-            System.out.println("4. Eliminar");
-            System.out.println("0. Salir");
-
-            opcion = sc.nextInt();
-
-            switch (opcion) {
-
-                case 1:
-                    // listar
-                    break;
-
-                case 2:
-                    // crear
-                    break;
-
-                case 3:
-                    // editar
-                    break;
-
-                case 4:
-                    // eliminar
-                    break;
-
-            }
-
-        } while (opcion != 0);
+// 2. Listar
+        usuarioService.listar().forEach(System.out::println);
 
     }
 }
