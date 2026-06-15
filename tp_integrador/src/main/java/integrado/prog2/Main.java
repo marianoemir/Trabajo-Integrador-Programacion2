@@ -1,9 +1,14 @@
 package integrado.prog2;
 
 import integrado.prog2.entities.Usuario;
+import integrado.prog2.entities.Categoria;
+import integrado.prog2.entities.Producto;
 import integrado.prog2.enums.Rol;
 import integrado.prog2.exception.EntityNotFoundException;
 import integrado.prog2.service.UsuarioService;
+import integrado.prog2.service.CategoriaService;
+import integrado.prog2.service.ProductoService;
+
 import java.util.List;
 import java.util.Scanner;
 import integrado.prog2.entities.Pedido;//import Andres
@@ -31,8 +36,8 @@ public class Main {
             opcion = leerEntero();
 
             switch (opcion) {
-                case 1 -> System.out.println("(pendiente compañero A)");
-                case 2 -> System.out.println("(pendiente compañero A)");
+                case 1 -> menuCategorias();
+                case 2 -> menuProductos();
                 case 3 -> menuUsuarios();
                 case 4 -> menuPedidos(); //Andres
                 case 0 -> System.out.println("Saliendo...");
@@ -157,7 +162,296 @@ public class Main {
             System.out.println("Operacion cancelada.");
         }
     }
+    
+    static void menuCategorias() {
 
+        int opcion;
+
+        do {
+            System.out.println("\n=== MENU CATEGORIAS ===");
+            System.out.println("1. Listar");
+            System.out.println("2. Crear");
+            System.out.println("3. Editar");
+            System.out.println("4. Eliminar");
+            System.out.println("0. Volver");
+            System.out.print("Seleccione: ");
+
+            opcion = leerEntero();
+
+            switch (opcion) {
+                case 1 -> listarCategorias();
+                case 2 -> crearCategoria();
+                case 3 -> editarCategoria();
+                case 4 -> eliminarCategoria();
+                case 0 -> System.out.println("Volviendo...");
+                default -> System.out.println("Opcion invalida.");
+            }
+
+        } while (opcion != 0);
+    }    
+    
+    static void listarCategorias() {
+        List<Categoria> categorias = categoriaService.listar();
+        if (categorias.isEmpty()) {
+            System.out.println("No hay categorias cargadas.");
+        } else {
+            categorias.forEach(System.out::println);
+        }
+    }
+
+    static void crearCategoria() {
+        
+        System.out.print("Nombre: ");
+        String nombre = sc.nextLine();
+     
+        System.out.print("Descripción: ");
+        String descripcion = sc.nextLine();
+
+        Categoria categoria = new Categoria();
+        categoria.setNombre(nombre);
+        categoria.setDescripcion(descripcion);
+
+        try {
+            
+            categoriaService.guardar(categoria);
+            System.out.println("Categoría creada correctamente.");
+            
+        } catch (IllegalArgumentException e) {
+            
+            System.out.println("Error: " + e.getMessage());
+        }
+    }    
+    
+    static void editarCategoria() {
+        listarCategorias();
+        System.out.print("Ingrese el ID de la categoria a editar: ");
+        Long id = leerLong();
+
+        try {
+            Categoria categoria = categoriaService.buscarPorId(id);
+            System.out.print("Nuevo nombre (" + categoria.getNombre() + "): ");
+            String nombre = sc.nextLine();
+            System.out.print("Nueva descripción (" + categoria.getDescripcion() + "): ");
+            String descripcion = sc.nextLine();
+
+            if (!nombre.isBlank()) categoria.setNombre(nombre);
+            if (!descripcion.isBlank()) categoria.setDescripcion(descripcion);
+
+            categoriaService.actualizar(categoria);
+            System.out.println("Categoría actualizada correctamente.");
+
+        } catch (EntityNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+    
+    static void eliminarCategoria() {
+        listarCategorias();
+        System.out.print("Ingrese el ID de la categoria a eliminar: ");
+        Long id = leerLong();
+
+        System.out.print("Confirma la eliminacion? (S/N): ");
+        String confirmacion = sc.nextLine();
+
+        if (confirmacion.equalsIgnoreCase("S")) {
+            try {
+                
+                categoriaService.eliminar(id);
+                System.out.println("Categoria eliminada correctamente.");
+                
+            } catch (EntityNotFoundException e) {
+                
+                System.out.println("Error: " + e.getMessage());
+                
+            }
+        } else {
+            System.out.println("Operacion cancelada.");
+        }
+    }
+
+
+    static void menuProductos() {
+
+        int opcion;
+
+        do {
+            System.out.println("\n=== MENU PRODUCTOS ===");
+            System.out.println("1. Listar");
+            System.out.println("2. Crear");
+            System.out.println("3. Editar");
+            System.out.println("4. Eliminar");
+            System.out.println("0. Volver");
+            System.out.print("Seleccione: ");
+
+            opcion = leerEntero();
+
+            switch (opcion) {
+                case 1 -> listarProductos();
+                case 2 -> crearProducto();
+                case 3 -> editarProducto();
+                case 4 -> eliminarProducto();
+                case 0 -> System.out.println("Volviendo...");
+                default -> System.out.println("Opcion invalida.");
+            }
+
+        } while (opcion != 0);
+    }
+    
+    static void listarProductos() {
+        List<Producto> productos = productoService.listar();
+        if (productos.isEmpty()) {
+            System.out.println("No hay productos cargados.");
+        } else {
+            productos.forEach(System.out::println);
+        }
+    }
+
+    static void crearProducto() {
+
+        try{
+        
+        System.out.print("Nombre: ");
+        String nombre = sc.nextLine();
+        
+        System.out.print("Precio: ");
+        Double precio = Double.parseDouble(sc.nextLine());
+        
+        System.out.print("Descripción: ");
+        String descripcion = sc.nextLine();
+        
+        System.out.print("Stock: ");
+        Integer stock = leerEntero();
+    
+        System.out.print("Imagen: ");
+        String imagen = sc.nextLine();
+        
+        
+        System.out.print("\nCATEGORÍAS DISPONIBLES: ");
+        
+        categoriaService.listar()
+                .forEach(System.out::println);
+
+        System.out.print("ID Categoria: ");
+
+        Long categoriaId = leerLong();
+
+        Categoria categoria =
+                categoriaService.buscarPorId(categoriaId);        
+
+        Producto producto = new Producto();
+        
+        producto.setNombre(nombre);
+        producto.setPrecio(precio);
+        producto.setDescripcion(descripcion);
+        producto.setStock(stock);
+        producto.setImagen(imagen);
+        producto.setDisponible(true);
+        producto.setCategoria(categoria);
+
+        productoService.guardar(producto);
+
+        System.out.println(
+                "Producto creado correctamente.");
+
+        } catch (EntityNotFoundException e) {
+
+            System.out.println(
+                    "Categoria inexistente.");
+
+        } catch (IllegalArgumentException e) {
+
+            System.out.println(
+                    "Error: " + e.getMessage());
+
+        } 
+    }
+    
+    static void editarProducto() {
+        listarProductos();
+        System.out.print("Ingrese el ID del producto a editar: ");
+        Long id = leerLong();
+
+        try {
+            Producto producto = productoService.buscarPorId(id);
+            
+            System.out.print("Nuevo nombre (" + producto.getNombre() + "): ");
+            String nombre = sc.nextLine();
+            
+            System.out.print("Nuevo precio (" + producto.getPrecio() + "): ");
+            String precioTxt = sc.nextLine();
+            
+            System.out.print("Nueva descripción (" + producto.getDescripcion() + "): ");
+            String descripcion = sc.nextLine();
+            
+            System.out.print("Nuevo Stock (" + producto.getStock() + "): ");
+            String stockTxt = sc.nextLine();
+            
+            System.out.print("Nueva imagen (" + producto.getImagen() + "): ");
+            String imagen = sc.nextLine();
+
+            if (!nombre.isBlank()) producto.setNombre(nombre);
+            if (!precioTxt.isBlank()) producto.setPrecio(Double.parseDouble(precioTxt));
+            if (!descripcion.isBlank()) producto.setDescripcion(descripcion);
+            if (!stockTxt.isBlank()) producto.setStock(Integer.parseInt(stockTxt));
+            if (!imagen.isBlank()) producto.setImagen(imagen);
+            
+            System.out.println("Categoria actual: " + producto.getCategoria().getNombre());            
+
+            System.out.print("\nCATEGORÍAS DISPONIBLES: ");
+
+            categoriaService.listar()
+                    .forEach(System.out::println);
+
+            System.out.print("ID de nueva categoria (Para mantener el mismo presionar <enter>): ");
+            
+            String categoriaTexto = sc.nextLine();
+            
+            if (!categoriaTexto.isBlank()) {
+                Long categoriaId =Long.parseLong(categoriaTexto);
+                Categoria categoria =categoriaService.buscarPorId(categoriaId);
+                producto.setCategoria(categoria);
+            }            
+            
+            
+            productoService.actualizar(producto);
+            System.out.println("Producto actualizado correctamente.");
+
+            } catch (EntityNotFoundException e) {
+                System.out.println("Error: " + e.getMessage());
+
+            } catch (NumberFormatException e) {
+
+            System.out.println(
+                    "Error: valor numerico invalido.");
+        }
+    }
+
+    static void eliminarProducto() {
+        
+        listarProductos();
+        System.out.print("Ingrese el ID del producto a eliminar: ");
+        Long id = leerLong();
+
+        System.out.print("Confirma la eliminacion? (S/N): ");
+        String confirmacion = sc.nextLine();
+
+        if (confirmacion.equalsIgnoreCase("S")) {
+            try {
+                
+                productoService.eliminar(id);
+                System.out.println("Producto eliminado correctamente.");
+                
+            } catch (EntityNotFoundException e) {
+                
+                System.out.println("Error: " + e.getMessage());
+                
+            }
+        } else {
+            System.out.println("Operacion cancelada.");
+        }
+    }    
+    
+    
     static int leerEntero() {
         try {
             int valor = Integer.parseInt(sc.nextLine());
