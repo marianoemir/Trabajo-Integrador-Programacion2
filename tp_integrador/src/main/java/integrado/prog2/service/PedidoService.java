@@ -32,8 +32,7 @@ public class PedidoService {
         }
 
         pedido.setTotal(
-                pedido.calcularTotal()
-        );
+                pedido.calcularTotal());
 
         pedidoDAO.guardar(pedido);
     }
@@ -45,9 +44,11 @@ public class PedidoService {
     public Pedido buscarPorId(Long id)
             throws EntityNotFoundException {
 
-        Pedido pedido = pedidoDAO.buscarPorId(id);
+        Pedido pedido =
+                pedidoDAO.buscarPorId(id);
 
         if (pedido == null) {
+
             throw new EntityNotFoundException(
                     "Pedido no encontrado");
         }

@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package integrado.prog2.entities;
 
 /**
@@ -16,8 +13,7 @@ public class DetallePedido extends Base {
 
     private Pedido pedido;
 
-    // TODO: reemplazar por Producto cuando exista
-    private Long productoId;
+    private Producto producto;
 
     public DetallePedido() {
     }
@@ -46,20 +42,24 @@ public class DetallePedido extends Base {
         this.pedido = pedido;
     }
 
-    public Long getProductoId() {
-        return productoId;
+    public Producto getProducto() {
+        return producto;
     }
 
-    public void setProductoId(Long productoId) {
-        this.productoId = productoId;
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     @Override
     public String toString() {
-        return "DetallePedido{" +
-                "cantidad=" + cantidad +
-                ", subtotal=" + subtotal +
-                ", productoId=" + productoId +
-                '}';
+
+        return "DetallePedido{"
+                + "producto="
+                + producto.getNombre()
+                + ", cantidad="
+                + cantidad
+                + ", subtotal="
+                + subtotal
+                + '}';
     }
 }
