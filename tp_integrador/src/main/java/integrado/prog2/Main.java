@@ -2,6 +2,7 @@ package integrado.prog2;
 
 import integrado.prog2.entities.Usuario;
 import integrado.prog2.entities.Categoria;
+import integrado.prog2.entities.DetallePedido;
 import integrado.prog2.entities.Producto;
 import integrado.prog2.enums.Rol;
 import integrado.prog2.exception.EntityNotFoundException;
@@ -11,11 +12,17 @@ import integrado.prog2.service.ProductoService;
 
 import java.util.List;
 import java.util.Scanner;
+import integrado.prog2.entities.Pedido;//import Andres
+import integrado.prog2.enums.Estado;
+import integrado.prog2.enums.FormaPago;
+import integrado.prog2.service.PedidoService; //import Andres
+import java.time.LocalDate;
 
 public class Main {
 
     static Scanner sc = new Scanner(System.in);
     static UsuarioService usuarioService = new UsuarioService();
+    static PedidoService pedidoService = new PedidoService();
     static CategoriaService categoriaService = new CategoriaService();
     static ProductoService productoService = new ProductoService();
 
@@ -38,7 +45,7 @@ public class Main {
                 case 1 -> menuCategorias();
                 case 2 -> menuProductos();
                 case 3 -> menuUsuarios();
-                case 4 -> System.out.println("(pendiente compañero C)");
+                case 4 -> menuPedidos(); //Andres
                 case 0 -> System.out.println("Saliendo...");
                 default -> System.out.println("Opcion invalida.");
             }
@@ -469,4 +476,337 @@ public class Main {
             return -1L;
         }
     }
+    
+    // Andres----------------------------------------------------------------------------------------------
+    static void menuPedidos() {
+
+    int opcion;
+
+    do {
+
+        System.out.println("\n=== MENU PEDIDOS ===");
+        System.out.println("1. Listar");
+        System.out.println("2. Crear");
+        System.out.println("3. Editar");
+        System.out.println("4. Eliminar");
+        System.out.println("0. Volver");
+        System.out.print("Seleccione: ");
+
+        opcion = leerEntero();
+
+        switch (opcion) {
+
+            case 1 -> listarPedidos();
+
+            case 2 -> crearPedido();
+
+            case 3 -> editarPedido();
+
+            case 4 -> eliminarPedido();
+
+            case 0 -> System.out.println("Volviendo...");
+
+            default -> System.out.println("Opcion invalida.");
+        }
+
+    } while (opcion != 0);
+}
+    
+    static void listarPedidos() {
+
+    List<Pedido> pedidos = pedidoService.listar();
+
+    if (pedidos.isEmpty()) {
+
+        System.out.println("No hay pedidos cargados.");
+
+    } else {
+
+        pedidos.forEach(System.out::println);
+
+    }
+}
+    
+    static void crearPedido() {
+
+    try {
+
+        Pedido pedido = new Pedido();
+
+        pedido.setFecha(LocalDate.now());
+
+        pedido.setEstado(
+                Estado.PENDIENTE);
+
+        // =====================
+        // SELECCIONAR USUARIO
+        // =====================
+
+        System.out.println("\n=== USUARIOS ===");
+
+        usuarioService.listar()
+                .forEach(System.out::println);
+
+        System.out.print(
+                "Ingrese ID usuario: ");
+
+        Long usuarioId = leerLong();
+
+        Usuario usuario =
+                usuarioService.buscarPorId(
+                        usuarioId);
+
+        pedido.setUsuario(usuario);
+
+        // =====================
+        // FORMA DE PAGO
+        // =====================
+
+        System.out.println(
+                "\nForma de pago");
+
+        System.out.println(
+                "1. EFECTIVO");
+
+        System.out.println(
+                "2. TARJETA");
+
+        System.out.println(
+                "3. TRANSFERENCIA");
+
+        int opcionPago =
+                leerEntero();
+
+        switch (opcionPago) {
+
+            case 1 ->
+                pedido.setFormaPago(
+                        FormaPago.EFECTIVO);
+
+            case 2 ->
+                pedido.setFormaPago(
+                        FormaPago.TARJETA);
+
+            case 3 ->
+                pedido.setFormaPago(
+                        FormaPago.TRANSFERENCIA);
+
+            default -> {
+
+                System.out.println(
+                        "Forma de pago invalida.");
+
+                return;
+            }
+        }
+
+        // =====================
+        // DETALLES
+        // =====================
+
+        String continuar;
+
+        do {
+
+            System.out.println(
+                    "\n=== PRODUCTOS ===");
+
+            productoService.listar()
+                    .forEach(System.out::println);
+
+            System.out.print(
+                    "ID producto: ");
+
+            Long productoId =
+                    leerLong();
+
+            Producto producto =
+                    productoService.buscarPorId(
+                            productoId);
+
+            System.out.print(
+                    "Cantidad: ");
+
+            int cantidad =
+                    leerEntero();
+
+            DetallePedido detalle = new DetallePedido();
+
+            detalle.setProducto(
+                    producto);
+
+            detalle.setCantidad(
+                    cantidad);
+
+            detalle.setSubtotal(
+                    producto.getPrecio()
+                    * cantidad);
+
+            pedido.addDetallePedido(
+                    detalle);
+
+            System.out.print(
+                    "Agregar otro producto? (S/N): ");
+
+            continuar =
+                    sc.nextLine();
+
+        } while (
+                continuar.equalsIgnoreCase(
+                        "S"));
+
+        // =====================
+        // TOTAL
+        // =====================
+
+        pedido.setTotal(
+                pedido.calcularTotal());
+
+        pedidoService.guardar(
+                pedido);
+
+        System.out.println(
+                "Pedido creado correctamente.");
+
+        System.out.println(
+                "Total: $"
+                + pedido.getTotal());
+
+    } catch (Exception e) {
+
+        System.out.println(
+                "Error: "
+                + e.getMessage());
+    }
+}
+    
+    static void editarPedido() {
+
+    listarPedidos();
+
+    System.out.print("Ingrese ID del pedido: ");
+
+    Long id = leerLong();
+
+    try {
+
+        Pedido pedido =
+                pedidoService.buscarPorId(id);
+
+        System.out.println(
+                "1. PENDIENTE");
+        System.out.println(
+                "2. CONFIRMADO");
+        System.out.println(
+                "3. TERMINADO");
+        System.out.println(
+                "4. CANCELADO");
+
+        System.out.print(
+                "Nuevo estado: ");
+
+        int opcionEstado =
+                leerEntero();
+
+        switch (opcionEstado) {
+
+    case 1 ->
+        pedido.setEstado(
+                Estado.PENDIENTE);
+
+    case 2 ->
+        pedido.setEstado(
+                Estado.CONFIRMADO);
+
+    case 3 ->
+        pedido.setEstado(
+                Estado.TERMINADO);
+
+    case 4 ->
+        pedido.setEstado(
+                Estado.CANCELADO);
+}
+
+        System.out.println(
+                "1. TARJETA");
+        System.out.println(
+                "2. TRANSFERENCIA");
+        System.out.println(
+                "3. EFECTIVO");
+
+        System.out.print(
+                "Forma de pago: ");
+
+        int opcionPago =
+                leerEntero();
+
+        switch (opcionPago) {
+
+    case 1 ->
+        pedido.setFormaPago(
+                FormaPago.TARJETA);
+
+    case 2 ->
+        pedido.setFormaPago(
+                FormaPago.TRANSFERENCIA);
+
+    case 3 ->
+        pedido.setFormaPago(
+                FormaPago.EFECTIVO);
+}
+
+        pedidoService.actualizar(
+                pedido);
+
+        System.out.println(
+                "Pedido actualizado.");
+
+    } catch (
+            EntityNotFoundException e) {
+
+        System.out.println(
+                "Error: "
+                + e.getMessage());
+    }
+}
+    
+    static void eliminarPedido() {
+
+    listarPedidos();
+
+    System.out.print(
+            "Ingrese el ID del pedido a eliminar: ");
+
+    Long id = leerLong();
+
+    System.out.print(
+            "Confirma la eliminacion? (S/N): ");
+
+    String confirmacion =
+            sc.nextLine();
+
+    if (confirmacion.equalsIgnoreCase("S")) {
+
+        try {
+
+            pedidoService.eliminar(id);
+
+            System.out.println(
+                    "Pedido eliminado correctamente.");
+
+        } catch (
+                EntityNotFoundException e) {
+
+            System.out.println(
+                    "Error: "
+                    + e.getMessage());
+        }
+
+    } else {
+
+        System.out.println(
+                "Operacion cancelada.");
+    }
+}
+    
 }
