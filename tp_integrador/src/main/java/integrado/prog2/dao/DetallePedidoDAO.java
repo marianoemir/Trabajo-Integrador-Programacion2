@@ -1,10 +1,7 @@
 
 package integrado.prog2.dao;
 
-/**
- *
- * @author andre
- */
+
 import integrado.prog2.entities.DetallePedido;
 
 import java.sql.Connection;

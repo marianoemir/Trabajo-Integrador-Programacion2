@@ -1,10 +1,6 @@
-
 package integrado.prog2.entities;
 
-/**
- *
- * @author andre
- */
+
 public class DetallePedido extends Base {
 
     private int cantidad;

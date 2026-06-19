@@ -1,10 +1,7 @@
 
 package integrado.prog2.service;
 
-/**
- *
- * @author andre
- */
+
 import integrado.prog2.dao.PedidoDAO;
 import integrado.prog2.entities.Pedido;
 import integrado.prog2.exception.EntityNotFoundException;
