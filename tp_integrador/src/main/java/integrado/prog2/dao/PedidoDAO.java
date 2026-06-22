@@ -1,4 +1,4 @@
-
+                       
 package integrado.prog2.dao;
 
 
@@ -42,30 +42,17 @@ public class PedidoDAO {
 
             Long pedidoId;
 
-            try (PreparedStatement ps =
-                         conn.prepareStatement(
-                                 sqlPedido,
-                                 Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ps = conn.prepareStatement(sqlPedido,Statement.RETURN_GENERATED_KEYS)) {
 
-                ps.setDate(
-                        1,
-                        Date.valueOf(
-                                pedido.getFecha()));
+                ps.setDate(1,Date.valueOf(pedido.getFecha()));
 
-                ps.setString(
-                        2,
-                        pedido.getEstado().name());
+                ps.setString(2,pedido.getEstado().name());
 
-                ps.setDouble(
-                        3,
-                        pedido.getTotal());
+                ps.setDouble(3,pedido.getTotal());
 
-                ps.setString(
-                        4,
-                        pedido.getFormaPago().name());
+                ps.setString(4,pedido.getFormaPago().name());
 
-                ps.setLong(
-                        5,
+                ps.setLong(5,
                         pedido.getUsuario().getId());
 
                 ps.executeUpdate();
@@ -91,7 +78,13 @@ public class PedidoDAO {
                         detalle,
                         pedidoId);
             }
-
+            
+            // FORZAR ERROR
+           /** if (true) {
+            throw new SQLException(
+            "Error de prueba para rollback");
+            } **/
+            
             conn.commit();
 
         } catch (SQLException e) {
